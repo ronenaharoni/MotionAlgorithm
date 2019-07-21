@@ -1,0 +1,1 @@
+fileTesting.d: ../fileTesting.c
