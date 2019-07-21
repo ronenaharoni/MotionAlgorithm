@@ -1,0 +1,235 @@
+﻿<!-- Some examples: --> 
+<!-- String: begins and ends with quotes:        					<A>'Some text'</A>                	--> 
+<!-- Vector/Matrix: begins and ends with [..]:   					<B>[2.718,3.1416; 137,0.015]</B>  	--> 
+<!-- Cell - begins and ends with {..}: 								<C>{5; 9;}</C>						-->    
+<!-- Double/floating point/integer - just the number: 				<D>2</D>						  	-->    
+<!-- Compicated string: variable defined above followed by string:	<E>"M_FallIdx + {1,}"</E>		  	-->    
+<!-- define variables for later use: 								<F>%a=5; b=7;%</F>					-->  
+
+<ECHO_Conf>
+	<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% --> 
+	<!-- %%%%%%%%%%%%%%%%%%%%%%%% FOREGROUND %%%%%%%%%%%%%%%%%%%%%%% --> 
+	<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% --> 
+	<FG>
+		<debugMode>1</debugMode>                            <!-- for display --> 
+		<debugFileFlag>0</debugFileFlag>                    <!-- for writing ECHO_Foreground_debug.txt --> 
+		<motionDebugMode>0</motionDebugMode>                <!-- for motion debug -->
+		<trackingDebugMode>0</trackingDebugMode>            <!-- for OOV disp etc .. -->
+		<motionPromptDebugMode>1</motionPromptDebugMode>    <!-- for motion prompt debug -->
+		<postureDebugMode>0</postureDebugMode>              <!-- for posture debug -->
+		<posturePromptDebugMode>0</posturePromptDebugMode>  <!-- for posture prompt debug & Trackiing & Acquisition -->
+		<locationDebugMode>0</locationDebugMode>            <!-- for location debug -->
+		<EnergyRoute_debugMode>0</EnergyRoute_debugMode>    <!-- For target detection from Motion -->
+		<StepFactor>999</StepFactor>                        <!-- choose large to ignore this value -->
+		<MinStepSize>0.5</MinStepSize>						<!-- minimum distance between two last locations, if distance is lower than it, we stay in former location -->
+		<MinDistanceForStanding>1</MinDistanceForStanding>	<!-- if distance [m] is bigger than it we say that the human is walking and then change posture to standing -->
+		<totalOOR_beforReset>20</totalOOR_beforReset>       <!-- after this number of detectionFlag=0, the radar will reset and go to Entry -->
+		<LpcPostProcessingFlag>0</LpcPostProcessingFlag>
+		<LpcCoefficients>2</LpcCoefficients>
+		<promptSpectogramAfterFall>0</promptSpectogramAfterFall>
+		<detectionFlagDebugMode>1</detectionFlagDebugMode>
+		<cubeSizeForZoomIn>100</cubeSizeForZoomIn> 			<!-- used by ImageExtraction5 -->
+		<DAA_Peak2min_threshold>10</DAA_Peak2min_threshold>	<!-- above this value, the system announce a detection -->
+		<DAA_Peak2avg_threshold>10</DAA_Peak2avg_threshold>	<!-- above this value, the system announce a detection -->
+		<DAA_debugMode>0</DAA_debugMode>
+		<Nbaselines>8</Nbaselines> 							<!-- number of baselines to choos in each array , can get ONLY the values: 2,4,6,8 -->
+		<HardDecisionFlagTM>1</HardDecisionFlagTM> 			<!-- this flag is "1" if we want that transitions (in transition matrix) which arn't valid will change DetectionFlag to 0 -->
+		<Proto>'P3'</Proto>
+		<!-- Spot Suppression parameters -->
+		<DetectionThr>0.99</DetectionThr>					<!-- if the Normalized Cross Correlation (NCC) is above this threshold it indicates that a human is present in this range -->
+		<TuningThr>0.999</TuningThr> 						<!-- if there is a human in the house this is the NCC threshold for erasing the fasts -->
+		<SpotSuppressionWinLen>50</SpotSuppressionWinLen>   <!-- length of window which we do the NCC -->
+		<ZerosGap>10</ZerosGap>								<!-- how much gap we take from the human's range to put zeros -->
+		<LastSpotRange>2.7</LastSpotRange>					<!-- As far range we look for the spot [m] -->
+		<SpotSuppression_debugMode>0</SpotSuppression_debugMode>	
+		<ShortRangeMode>0</ShortRangeMode> 	
+		<nKeepBinsAfterCorrBreaks>100</nKeepBinsAfterCorrBreaks> <!-- number of bins we keep after the correlation breaks -->
+		<!-- ART -->
+		<RingWidth>35</RingWidth>									<!-- cm -->		
+		<cube_size_ART>140</cube_size_ART>							<!-- cm -->
+		<Resolution_ART>15</Resolution_ART> 						<!-- cm -->
+		<TargetDetection_DebugMode>0</TargetDetection_DebugMode>
+		<ART_Flag>1</ART_Flag>
+
+
+<Motion>
+   <Nbins>288</Nbins>
+   <Nscans>400</Nscans>
+   <FS>250</FS>
+   <RF_NumOfClasses>4</RF_NumOfClasses>
+   <SpctrogramRangeWidth>120</SpctrogramRangeWidth>
+   <SpectrogramWinLength>30</SpectrogramWinLength>
+   <SpectrogramN_Overlap>25</SpectrogramN_Overlap>
+   <Fbins>100</Fbins>
+   <SpectrogramNoiseFreqBins>4</SpectrogramNoiseFreqBins>
+   <Fmin_bin>2</Fmin_bin>
+   <MinFreqPlusMinus></MinFreqPlusMinus>
+   <MinFreqReal>2.512562814070352</MinFreqReal>
+   <MinEventDuration>30</MinEventDuration>
+   <NoiseThresh>5</NoiseThresh>
+   <GapLength>14</GapLength>
+   <MedianValue>20</MedianValue>
+   <AvgValue>5</AvgValue>
+    <TopMaxFreq>5</TopMaxFreq>
+    <TruncateReal>1</TruncateReal>
+    <TruncateHilbert>1</TruncateHilbert>
+</Motion>
+
+</FG>
+	<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% --> 
+	<!-- %%%%%%%%%%%%%%%%%%%%%%%% BACKGROUND %%%%%%%%%%%%%%%%%%%%%%% --> 
+	<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% --> 
+	<BG>
+	<!-- Socket params -->
+		<IpAddr>'192.168.137.134'</IpAddr><!--192.168.1.100-->
+		<port>5000</port><!--21210-->
+		
+		<debugFileFlag>1</debugFileFlag> 	<!-- for writing ECHO_Background_debug.txt -->  
+		<Rstart_m>1</Rstart_m>
+		<Rstop_m>3.5</Rstop_m>
+		<PII>11</PII>
+		<Tzero_ns>17</Tzero_ns>
+		<codeChannel>20</codeChannel>		<!-- % 20 -> 50ns ; 3 -> 100 ns -->
+		<transmitGain>63</transmitGain>		<!-- 0:min ,63:max	-->
+		<debugMode>1</debugMode> 			<!-- for training location --> 
+		<Nscans_Resp>200</Nscans_Resp> 		<!-- 200*0.1 = 20sec --> 
+		<TxBitForMotion>0</TxBitForMotion> 	<!-- 0 / 1 --> 
+		<RxAntForMotion>25</RxAntForMotion> <!-- 1:32, mapped later to 00000:11111 --> 
+		<SensorHeight>260</SensorHeight> 	<!-- cm -->  
+		<trainingSensorHeight>260</trainingSensorHeight> 	<!-- [cm] moving the floor to this location to fit the training values -->  
+		<HumanHeight>190</HumanHeight> 		<!-- cm -->
+		<FullSize>500</FullSize>	 		<!-- cm -->
+		<xMin>-500</xMin>
+		<xMax>500</xMax>
+		<yMin>-500</yMin>
+		<yMax>500</yMax>
+        <cube_size>500</cube_size>          <!-- tracking cube size. The size of half cube [cm] -->
+		<Rmin>1</Rmin>						<!-- minimum Rstart_m -->
+		
+		<!--ACQUISITION -->
+		<Acq_Nscans_Motion>400</Acq_Nscans_Motion> 
+		<N_ChancesLoc>2</N_ChancesLoc>						<!--Number of chances we give for detection of location -->
+		<QS_Tolerance>1</QS_Tolerance>   					<!--Max Distance [m] (error) allowed between location1 & location2 in QS mode-->
+		<Movement_Tolerance>5</Movement_Tolerance>  		<!--Max Distance [m] allowed between location1 & location2 in Movement mode-->
+		<RingsOverlap>0.5</RingsOverlap>            		<!--Overlap [m] between search rings -->
+		<N_Samples>1</N_Samples>							<!--number of samples for noise estimation (In Noise training)-->
+		<min_SNR_for_detection>10</min_SNR_for_detection> 	<!--How much dB the noise threshold will be above the 90% of the noise histogram-->
+		<BufferSize>3</BufferSize>							<!--We look at the last 'BufferSize' scores to decide which we detect the human or not-->
+		<ScoreQS>0.75</ScoreQS>								<!--Score (weigth) for QS-->
+		<ScoreMVMT>1</ScoreMVMT>							<!--Score (weigth) for Movement-->
+		<CycleDelay>1</CycleDelay>							<!--Delay between cycles [s]-->
+		<EnableAcq>0</EnableAcq>							<!-- 0-disabled, 1-enable acq -->
+		<AcqDebugMode>0</AcqDebugMode>						<!-- Acquisition debug mode flag -->	
+		<saveFramesFlag>0</saveFramesFlag>					<!-- ECHO frames will be saved in 'SavedFrames' folder. this can be changed via DB -->
+		<Rstart_m_minForResp>0.95</Rstart_m_minForResp>		<!-- if Rstart_m is lower than this value, e.g. 0.1 for japan, start resp scan from 1 to 1+2.5 -->
+		<delta_R>0.1</delta_R> 								<!-- jumps between range for noise records [m] -->
+		<DelayBetweenRecords>[0.007,0,0.007,0]</DelayBetweenRecords> <!-- time delay [s] to implant between P1-M1, M1-P2, P2-M2, M2-P1 in order to get spot like in Operational -->
+	</BG>
+	<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% --> 
+	<!-- %%%%%%%%%%%%%%%%%%%%%%%% COGNITIVE %%%%%%%%%%%%%%%%%%%%%%%% --> 
+	<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% --> 
+	<COG>
+		<Basic_Conf>
+			<frameToTimeFactor>3.8</frameToTimeFactor> <!-- [sec] becuase between each 'UpdatedStateStream' there is 2 motions and 2 postures: 2*1.6 + 2*0.3 = 3.8 seconds.. devide by 60 to get minues -->
+			<SYSTEM_ALIVE_TIMEOUT>15</SYSTEM_ALIVE_TIMEOUT> <!-- MAIN_Init_COG_ECHO --> 
+			<SYSTEM_ALIVE_DT>10</SYSTEM_ALIVE_DT>			<!-- after 10 frames this CMD is send by the COG to DB --> 
+			<StateStreamFolder>'HumanStateClassifier\StateStream\'</StateStreamFolder> <!-- directory of the data statestreams created by the FG, relative to ECHO_OPERATIONAL -->  
+			<SECS_in_hour>3.7</SECS_in_hour><!-- for demo puproses: 60 minimal value-3600 maximal value --> 
+			<N_hours_in_day>6</N_hours_in_day> <!-- USE ONLY THIS OPTIONS: 6,12,24 (HARDCODED!!!). in code: N_HoursInADay --> 
+			<N_days_in_week>7</N_days_in_week> <!-- for demo puproses: 1..7 --> 
+		</Basic_Conf>
+		<GA3_conf>
+			<Smooth_N_Sessions_Factor>0</Smooth_N_Sessions_Factor> <!-- for walking processing: isWalk = [1 0 1 0 0 1] becomes [1 1 1 0 0 1] with Factor = 1, and left without change with Factor = 0 -->
+		</GA3_conf>
+		<regExpWinLen>7</regExpWinLen>
+		<Events>
+			<Variables1>%P_StandingIdx = 1; P_SittingIdx = 2; P_LyingIdx = 3; P_NoHumanIdx = 4; P_OOR_Idx = 5;%</Variables1>
+			<Variables2>%M_NormalMotionIdx = 1; M_SittingIdx = 2; M_FallIdx = 3; M_QuasistaticIdx = 4;%</Variables2>
+			<Event1>
+				<Name>'Fall'</Name>
+				<L_idx>'\d'</L_idx>
+				<P_idx>'[P_StandingIdx|P_SittingIdx]{1}P_LyingIdx{2}\d{4}'</P_idx> <!-- default fall -->
+				<M_idx>'[M_NormalMotionIdx|M_SittingIdx|M_QuasistaticIdx]{1}M_FallIdx{1}\d{5}'</M_idx>
+				<R_idx>'\d'</R_idx>
+				<PwDT_idx>'\d'</PwDT_idx>
+			</Event1>
+			<Event2>
+				<Name>'AcuteFall'</Name>
+				<L_idx>'\d'</L_idx>
+				<P_idx>'([P_StandingIdx|P_SittingIdx]{1}P_LyingIdx{4}[P_SittingIdx|P_LyingIdx]{2})|([P_StandingIdx|P_SittingIdx]{2}P_LyingIdx{3}[P_SittingIdx|P_LyingIdx]{2})'</P_idx> <!--  relexation: (1|2){1}3{4}(2|3){2} or (1|2){2}3{4}(2|3){1} -->
+				<M_idx>'[M_NormalMotionIdx|M_SittingIdx|M_QuasistaticIdx]{1}M_FallIdx{1}\d{5}'</M_idx>
+				<R_idx>'\d'</R_idx>
+				<PwDT_idx>'\d'</PwDT_idx>
+			</Event2>
+			<Event3>
+				<Name>'ModerateFall'</Name>
+				<L_idx>'\d'</L_idx>
+				<P_idx>'([P_StandingIdx|P_SittingIdx]{1}P_LyingIdx{2}\d{3}P_StandingIdx{1})|([P_StandingIdx|P_SittingIdx]{2}P_LyingIdx{2}\d{2}P_StandingIdx{1})'</P_idx>
+				<!-- 'P_StandingIdx{1,}P_SittingIdx{0,1}P_LyingIdx{1,3}P_SittingIdx{0,2}P_StandingIdx{1}' -->
+				<M_idx>'[M_NormalMotionIdx|M_SittingIdx|M_QuasistaticIdx]{1}M_FallIdx{1}\d{5}'</M_idx>
+				<!-- 'M_FallIdx{1}' -->
+				<R_idx>'\d'</R_idx>
+				<PwDT_idx>'\d'</PwDT_idx>
+			</Event3>
+			<Event4>
+				<Name>'FarAcuteFall'</Name>
+				<L_idx>'\d'</L_idx> <!-- originally was \d -->
+				<P_idx>'\d'</P_idx>
+				<M_idx>'(\d{1}M_FallIdx{1}M_NormalMotionIdx{1}M_QuasistaticIdx{4})|(\d{1}M_FallIdx{1}M_SittingIdx{1}M_QuasistaticIdx{4})|(\d{1}M_FallIdx{1}M_QuasistaticIdx{4}\d{1})'</M_idx>  <!-- 'M_FallIdx{1,}[M_NormalMotionIdx{0,1}|M_SittingIdx{0,1}]M_QuasistaticIdx{4,}' -->
+				<R_idx>'\d'</R_idx>
+				<PwDT_idx>'\d'</PwDT_idx>
+			</Event4>
+			<Event5>
+				<Name>'Drown'</Name> <!-- Drown in Bath -->
+				<L_idx>'L_Entry_L{999,}'</L_idx> <!-- change to '[L_Bathtub_L|L_Bathtub 2_L]{7}', currently disabled L_Entry_L{999,} -->
+				<P_idx>'\d'</P_idx>
+				<M_idx>'\d'</M_idx>
+				<R_idx>'\d'</R_idx>
+				<PwDT_idx>'[P_LyingIdx|P_SittingIdx]{2}P_NoHumanIdx{2}\d{3}'</PwDT_idx> <!-- P_NoHumanIdx{2}\d{3} -->
+			</Event5>
+			<Event6>
+				<Name>'Slip'</Name> <!-- Slip in Bath -->
+				<L_idx>'L_Livingroom_L{999}'</L_idx> <!-- change to 'L_Bathtub_L{7}', currently disabled L_Entry_L{999,} -->
+				<P_idx>'([P_StandingIdx|P_SittingIdx]{1}P_LyingIdx{6})|([P_StandingIdx|P_SittingIdx]{2}P_LyingIdx{5})'</P_idx>
+				<M_idx>'\d'</M_idx> <!-- '[M_NormalMotionIdx|M_SittingIdx|M_QuasistaticIdx]{1}M_SittingIdx{1}\d{5}' -->
+				<R_idx>'\d'</R_idx>
+				<PwDT_idx>'\d'</PwDT_idx>
+			</Event6>
+			<Event7>
+				<Name>'Out Of Home'</Name>
+				<L_idx>'L_Entry_L{1}\d{6}'</L_idx>
+				<P_idx>'\d'</P_idx>
+				<M_idx>'\d'</M_idx>
+				<R_idx>'\d'</R_idx>
+				<PwDT_idx>'[P_StandingIdx|P_SittingIdx]{1}P_NoHumanIdx{3}\d{3}'</PwDT_idx>
+			</Event7>
+		</Events>
+		<GoToResp_Conf>
+			<N_QUASISTATI_RESP>100</N_QUASISTATI_RESP> <!-- N FRAMES OF QUASISTATIC MOTION FRAMES BEFORE GOIN TO RESP -->
+			<Wanted_Respiration_Frames>1</Wanted_Respiration_Frames> <!-- N FRAMES TO GO TO RESP- how many frames of respiration should BG go to:  'Go_To_Respiration'->'Exit_Respiration' -->
+			<FmaxSleep>0.2</FmaxSleep> 						<!-- Maximum value of raspiration frequency for sleeping -->
+			<FmaxNormal>0.45</FmaxNormal> 					<!-- Maximum value of raspiration frequency for normal rate , above this rate it's hyperventilation-->
+			<FreqErrorTolerance>0.1</FreqErrorTolerance>   	<!-- How much difference between last and current respiration rate we afford to say that the rate didn't change -->
+			<WantedRespCycles>[1,1,1]</WantedRespCycles> 			<!-- How much respiration cycles we want in each state [ Sleeping, Normal rate, Hyperventilation ]-->
+		</GoToResp_Conf>
+	</COG>
+	<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% --> 
+	<!-- %%%%%%%%%%%%%%%%%%%% Common Variables %%%%%%%%%%%%%%%%%%%%% --> 
+	<!-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% --> 
+	<Common>
+	<N_CycBuf>100</N_CycBuf> <!-- common variable for FG+COG - UpdatedState0 to UpdatedState99 -->
+		<Posture>
+			<P_StandingIdx>1</P_StandingIdx>
+			<P_SittingIdx>2</P_SittingIdx>
+			<P_LyingIdx>3</P_LyingIdx>
+			<P_NoHumanIdx>4</P_NoHumanIdx>
+			<P_OOR_Idx>5</P_OOR_Idx>
+		</Posture>
+		<Motion>
+			<M_NormalMotionIdx>1</M_NormalMotionIdx>
+			<M_SittingIdx>2</M_SittingIdx>
+			<M_FallIdx>3</M_FallIdx>
+			<M_QuasistaticIdx>4</M_QuasistaticIdx>
+		</Motion>
+	</Common>
+</ECHO_Conf>
