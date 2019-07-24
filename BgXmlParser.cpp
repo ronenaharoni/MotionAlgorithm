@@ -250,7 +250,7 @@ void parse (xmlDocPtr doc, xmlNodePtr cur , MotionXML_Params *MotionXML_Params )
 				sscanf((const char*)key , "%d" , (int*)(parmChar[index].parameter) );
 				break;
 			case MinFreqPlusMinus   :
-				sscanf((const char*)key , "%d" , (int*)(parmChar[index].parameter) );
+				sscanf((const char*)key , "%f" , (int*)(parmChar[index].parameter) );
 				break;
 			case MinFreqReal   :
 				sscanf((const char*)key , "%f" , (float*)(parmChar[index].parameter) );

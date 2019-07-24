@@ -3,49 +3,49 @@
 #include "MotionHeader.h"
 #include "polyfit.h"
 
-int MotionTracking(float* Mscan[],SysParams_Struct* SysParams,BgRadarParams *bgParams){
+int MotionTracking(float* Mscan[],FgParams_Struct* FgParams,BgRadarParams *bgParams){
 	int i,k,t,m;
 	int DistThr= 5;
 	float Centoird1,Centoird2, Noise_dB;
-	float SumOfSecondDiff,MeanOfDiff,FirstDiff[SysParams->Motion.Nscans-1],SecondDiff[SysParams->Motion.Nscans-2];
+	float SumOfSecondDiff,MeanOfDiff,FirstDiff[FgParams->Motion.Nscans-1],SecondDiff[FgParams->Motion.Nscans-2];
 	float SumForVar,NoiseEstimation,PowerOfMscan,maxEnergyPerTime;
-	//	float energyPerTime_dB[SysParams->Motion.Nbins][SysParams->Motion.SpectrogramTimeBinsSingleMotion];
-	double 	ValuesForInterp[SysParams->Motion.SpectrogramTimeBinsSingleMotion];
-	double PointsForInterp[SysParams->Motion.SpectrogramTimeBinsSingleMotion];
+	//	float energyPerTime_dB[FgParams->Motion.Nbins][FgParams->Motion.SpectrogramTimeBinsSingleMotion];
+	double 	ValuesForInterp[FgParams->Motion.SpectrogramTimeBinsSingleMotion];
+	double PointsForInterp[FgParams->Motion.SpectrogramTimeBinsSingleMotion];
 	int NumPointsForInterp=0;
 	double p[2];//1st order polynom coefficients
 	float   NextRange,RstartWanted;
-	float* energyPerTime_dB[SysParams->Motion.Nbins];//,*Mscan_old[SysParams.Nscans];
-	for (i=0; i<SysParams->Motion.Nbins; i++){
-		energyPerTime_dB[i] = (float *)malloc(SysParams->Motion.SpectrogramTimeBinsSingleMotion * sizeof(float));
+	float* energyPerTime_dB[FgParams->Motion.Nbins];//,*Mscan_old[FgParams.Nscans];
+	for (i=0; i<FgParams->Motion.Nbins; i++){
+		energyPerTime_dB[i] = (float *)malloc(FgParams->Motion.SpectrogramTimeBinsSingleMotion * sizeof(float));
 	}
 
-	//	int FirstBinAboveThresholdPerTime[SysParams->Motion.SpectrogramTimeBinsSingleMotion];
-	//	memset(FirstBinAboveThresholdPerTime,0,(SysParams->Motion.SpectrogramTimeBinsSingleMotion)*sizeof(int));
+	//	int FirstBinAboveThresholdPerTime[FgParams->Motion.SpectrogramTimeBinsSingleMotion];
+	//	memset(FirstBinAboveThresholdPerTime,0,(FgParams->Motion.SpectrogramTimeBinsSingleMotion)*sizeof(int));
 
-	for(i=0;i<SysParams->Motion.Nbins;i++){//calculate NoiseEstimation=var(diff(Signal_k,2)) for each bin
+	for(i=0;i<FgParams->Motion.Nbins;i++){//calculate NoiseEstimation=var(diff(Signal_k,2)) for each bin
 		SumOfSecondDiff=0;
-		for(k=0;k<SysParams->Motion.Nscans-1;k++){//1st Diff
+		for(k=0;k<FgParams->Motion.Nscans-1;k++){//1st Diff
 			FirstDiff[k]=(Mscan[k+1][i]-Mscan[k][i]);
 		}
-		for(k=0;k<SysParams->Motion.Nscans-2;k++){//2nd Diff
+		for(k=0;k<FgParams->Motion.Nscans-2;k++){//2nd Diff
 			SecondDiff[k]=(FirstDiff[k+1]-FirstDiff[k]);
 			SumOfSecondDiff+=SecondDiff[k];
 			//			printf("%d %lf\n",k,SecondDiff[k]);
 		}
 
-		MeanOfDiff=SumOfSecondDiff/(SysParams->Motion.Nscans-2);//Calculate mean
+		MeanOfDiff=SumOfSecondDiff/(FgParams->Motion.Nscans-2);//Calculate mean
 		SumForVar=0;
-		for(k=0;k<SysParams->Motion.Nscans-2;k++){//VAR=SUM((x-mu)^2)/N-1,  N-1 because it's unbiased estimator
+		for(k=0;k<FgParams->Motion.Nscans-2;k++){//VAR=SUM((x-mu)^2)/N-1,  N-1 because it's unbiased estimator
 			SumForVar+=pow((SecondDiff[k]-MeanOfDiff),2);
 		}
-		NoiseEstimation=SumForVar/((SysParams->Motion.Nscans-2)-1);//it's the Variance
+		NoiseEstimation=SumForVar/((FgParams->Motion.Nscans-2)-1);//it's the Variance
 
-		for(t=0;t<SysParams->Motion.SpectrogramTimeBinsSingleMotion;t++){//take 30 points of slow and calculate the max energy of them
+		for(t=0;t<FgParams->Motion.SpectrogramTimeBinsSingleMotion;t++){//take 30 points of slow and calculate the max energy of them
 			maxEnergyPerTime=0;
-			for(m=0;m<SysParams->Motion.SpectrogramWinLength;m++){
-				PowerOfMscan=pow(Mscan[m+t*(SysParams->Motion.SpectrogramTimeShift)][i],2);
-				//				printf("%d %lf\n",m,Mscan[m+t*(SysParams->Motion.TimeShift)][i]);
+			for(m=0;m<FgParams->Motion.SpectrogramWinLength;m++){
+				PowerOfMscan=pow(Mscan[m+t*(FgParams->Motion.SpectrogramTimeShift)][i],2);
+				//				printf("%d %lf\n",m,Mscan[m+t*(FgParams->Motion.TimeShift)][i]);
 
 				if(PowerOfMscan > maxEnergyPerTime){
 					maxEnergyPerTime=PowerOfMscan;
@@ -59,7 +59,7 @@ int MotionTracking(float* Mscan[],SysParams_Struct* SysParams,BgRadarParams *bgP
 
 	}
 
-	K_means(energyPerTime_dB,SysParams,&Centoird1,&Centoird2);//Calulcate the centroids of the samples
+	K_means(energyPerTime_dB,FgParams,&Centoird1,&Centoird2);//Calulcate the centroids of the samples
 
 	if(fabs(Centoird1-Centoird2)>DistThr){
 		if(Centoird1>Centoird2)
@@ -74,10 +74,10 @@ int MotionTracking(float* Mscan[],SysParams_Struct* SysParams,BgRadarParams *bgP
 
 	//1st order interpolation for the curve of the walking
 
-	for(t=0;t<SysParams->Motion.SpectrogramTimeBinsSingleMotion;t++){
-		for(i=0;i<SysParams->Motion.Nbins;i++){
+	for(t=0;t<FgParams->Motion.SpectrogramTimeBinsSingleMotion;t++){
+		for(i=0;i<FgParams->Motion.Nbins;i++){
 			if(energyPerTime_dB[i][t]>Noise_dB){//find the first Bin which crosses the energy
-				ValuesForInterp[NumPointsForInterp]=SysParams->Motion.Rbin_m[i];//this is the first rbin_m who cross the threshold put in rbin_m
+				ValuesForInterp[NumPointsForInterp]=FgParams->Motion.Rbin_m[i];//this is the first rbin_m who cross the threshold put in rbin_m
 				PointsForInterp[NumPointsForInterp]=t+1;//save the valid time point for interpolation, +1 to be like matlab
 				NumPointsForInterp+=1;
 				break;
@@ -87,14 +87,14 @@ int MotionTracking(float* Mscan[],SysParams_Struct* SysParams,BgRadarParams *bgP
 	}
 
 	//Add this
-	if((SysParams->Motion.SpectrogramTimeBinsSingleMotion - NumPointsForInterp) > 0.87*SysParams->Motion.SpectrogramTimeBinsSingleMotion){//if we don't have enough points -> don't change
-//		SysParams->Rstart_corrected=SysParams->Rbin_m[0];
-//		SysParams->Rstop_corrected=SysParams->Rbin_m[SysParams->Motion.SpectrogramTimeBinsSingleMotion-1]-0.1;
-		bgParams->Rstart_m=SysParams->Motion.Rbin_m[0];
-		bgParams->Rstop_m=SysParams->Motion.Rbin_m[SysParams->Motion.SpectrogramTimeBinsSingleMotion-1]-0.1;
+	if((FgParams->Motion.SpectrogramTimeBinsSingleMotion - NumPointsForInterp) > 0.87*FgParams->Motion.SpectrogramTimeBinsSingleMotion){//if we don't have enough points -> don't change
+//		FgParams->Rstart_corrected=FgParams->Rbin_m[0];
+//		FgParams->Rstop_corrected=FgParams->Rbin_m[FgParams->Motion.SpectrogramTimeBinsSingleMotion-1]-0.1;
+		bgParams->Rstart_m=FgParams->Motion.Rbin_m[0];
+		bgParams->Rstop_m=FgParams->Motion.Rbin_m[FgParams->Motion.SpectrogramTimeBinsSingleMotion-1]-0.1;
 
 
-			for (i = 0; i < SysParams->Motion.Nbins; i++) {
+			for (i = 0; i < FgParams->Motion.Nbins; i++) {
 				free(energyPerTime_dB[i]);
 			}
 
@@ -103,7 +103,7 @@ int MotionTracking(float* Mscan[],SysParams_Struct* SysParams,BgRadarParams *bgP
 
 	polyfit(PointsForInterp,ValuesForInterp,NumPointsForInterp,1,p);//1 si the order MUST TO BE float
 
-	NextRange=p[1]*SysParams->Motion.SpectrogramTimeBinsSingleMotion+p[0];//insert the last point in order to detemine the center of the next ring
+	NextRange=p[1]*FgParams->Motion.SpectrogramTimeBinsSingleMotion+p[0];//insert the last point in order to detemine the center of the next ring
 
 	RstartWanted=bgParams->Rmin;
 	if ((NextRange-0.5*2.5) > RstartWanted)//max(nextRange - 1.25, Rmin)
@@ -118,7 +118,7 @@ int MotionTracking(float* Mscan[],SysParams_Struct* SysParams,BgRadarParams *bgP
 		bgParams->Rstop_m = RstartWanted + 2.5;
 	}
 
-	for (i = 0; i < SysParams->Motion.Nbins; i++) {
+	for (i = 0; i < FgParams->Motion.Nbins; i++) {
 				free(energyPerTime_dB[i]);
 			}
 
@@ -126,18 +126,18 @@ int MotionTracking(float* Mscan[],SysParams_Struct* SysParams,BgRadarParams *bgP
 }
 
 
-int K_means(float* energyPerTime_dB[],SysParams_Struct* SysParams,float* ChosenCentoird1,float* ChosenCentoird2){
+int K_means(float* energyPerTime_dB[],FgParams_Struct* FgParams,float* ChosenCentoird1,float* ChosenCentoird2){
 	float SumForCenteroid1, SumForCenteroid2,Centeroid1,Centeroid2,PrevCenteroid1,PrevCenteroid2;
 	 float epsilon=1e-5;
 	int i,t,AlgorithmDone=0;
 	int NumOfSamplesCentroid1,NumOfSamplesCentroid2,NumOfIter=0;
 	SumForCenteroid1=0;
 	SumForCenteroid2=0;
-	int Half_K_mean_TotalSamples=SysParams->Motion.SpectrogramTimeBinsSingleMotion * SysParams->Motion.Nbins/2;
+	int Half_K_mean_TotalSamples=FgParams->Motion.SpectrogramTimeBinsSingleMotion * FgParams->Motion.Nbins/2;
 	//find initial centroids by deviding to two groups
-	for(i=0;i<SysParams->Motion.Nbins;i++){
-		for(t=0;t<SysParams->Motion.SpectrogramTimeBinsSingleMotion;t++){
-			if(t<SysParams->Motion.SpectrogramTimeBinsSingleMotion/2)//first half
+	for(i=0;i<FgParams->Motion.Nbins;i++){
+		for(t=0;t<FgParams->Motion.SpectrogramTimeBinsSingleMotion;t++){
+			if(t<FgParams->Motion.SpectrogramTimeBinsSingleMotion/2)//first half
 				SumForCenteroid1+=energyPerTime_dB[i][t];
 			else//second half
 				SumForCenteroid2+=energyPerTime_dB[i][t];
@@ -153,8 +153,8 @@ int K_means(float* energyPerTime_dB[],SysParams_Struct* SysParams,float* ChosenC
 		NumOfSamplesCentroid1=0;
 		NumOfSamplesCentroid2=0;
 
-		for(i=0;i<SysParams->Motion.Nbins;i++){
-			for(t=0;t<SysParams->Motion.SpectrogramTimeBinsSingleMotion;t++){
+		for(i=0;i<FgParams->Motion.Nbins;i++){
+			for(t=0;t<FgParams->Motion.SpectrogramTimeBinsSingleMotion;t++){
 
 //				printf("%d %d    %lf\n",i,t,energyPerTime_dB[i][t]);
 

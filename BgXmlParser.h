@@ -15,9 +15,6 @@ extern "C" {
 
 
 
-
-
-
 typedef struct {
 	int Nscans;
 	int Nbins;
@@ -31,7 +28,7 @@ typedef struct {
 	int Fbins;
 	int NoiseThresh;
 	int TopMaxFreq;
-	int MinFreqPlusMinus;
+	float MinFreqPlusMinus;
 	float MinFreqReal;
 	int MinEventDuration;
 	int GapLength;
